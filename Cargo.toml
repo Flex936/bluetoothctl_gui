@@ -1,0 +1,38 @@
+[package]
+name = "bluetoothctl_gui"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+iced = { version = "0.14.0", default-features = false, features = [
+    "wgpu",
+    "tokio",
+    "wayland",
+    "x11",
+    "crisp",
+] }
+tokio = { version = "1.52.3", features = ["process"] }
+
+[profile.dev]
+opt-level = 1
+debug = true
+strip = "none"
+debug-assertions = true
+overflow-checks = true
+lto = false
+panic = 'unwind'
+incremental = true
+codegen-units = 256
+rpath = false
+
+[profile.release]
+opt-level = 3
+debug = false
+strip = "symbols"
+debug-assertions = false
+overflow-checks = false
+lto = true
+panic = 'unwind'
+incremental = false
+codegen-units = 1
+rpath = false
