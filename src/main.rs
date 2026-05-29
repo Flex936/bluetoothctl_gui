@@ -28,7 +28,8 @@ fn update(state: &mut BluetoothApp, message: Message) -> Task<Message> {
 }
 
 async fn run_command_async(cmd: String) -> String {
-    let output = Command::new("bluetoothctl").arg(&cmd).output().await;
+    let cmds: Vec<&str> = cmd.split_whitespace().collect();
+    let output = Command::new("bluetoothctl").args(cmds).output().await;
 
     match output {
         Ok(out) => {
@@ -54,15 +55,28 @@ fn view(state: &BluetoothApp) -> Element<'_, Message> {
         button("Power On").on_press(Message::RunCommand("power on".to_string())),
         button("Power Off").on_press(Message::RunCommand("power off".to_string())),
         button("Devices").on_press(Message::RunCommand("devices".to_string())),
-        button("Paired").on_press(Message::RunCommand("paired-devices".to_string())),
     ]
     .spacing(15);
+
+    let lines = state
+        .terminal_output
+        .lines()
+        .map(|line| button(line).into());
 
     let content = column![
         text("Bluetooth Controller").size(32),
         controls,
         text("Terminal Output:").size(20),
-        container(scrollable(text(&state.terminal_output)))
+        /* container(scrollable(text(&state.terminal_output)))
+        .width(Length::Fill)
+        .height(Length::Fill)
+        .padding(10)
+        .style(|theme: &iced::Theme| {
+            let palette = theme.extended_palette();
+            container::Style::default().background(palette.background.weak.color)
+        }),
+        */
+        container(scrollable(column(lines).spacing(10).padding(10)))
             .width(Length::Fill)
             .height(Length::Fill)
             .padding(10)
